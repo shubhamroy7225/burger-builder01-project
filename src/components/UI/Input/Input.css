@@ -1,0 +1,33 @@
+.Input{
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.Label{
+    font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
+}
+.CustomInput{
+    outline: none;
+    border: 1px solid #ccc;
+    background-color: white;
+    font: inherit;
+    padding: 20px 10px;
+    margin-top: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.CustomInput:focus{
+    outline: none;
+    background-color: #ccc;
+    
+}
+.Invalid{
+    border: 1px solid red;
+     background-color: rgb(236, 97, 97);
+}
+.ValidationError{
+    color: red;
+    margin: 5px 0;
+}
