@@ -15,13 +15,18 @@ const initialState = {
       case actionsTypes.SET_INGREDIENTS:
         return{
           ...state,
-          ingredients:action.ingredients,
+          ingredients:{
+            salad:action.ingredients.salad,
+            bacon:action.ingredients.bacon,
+            cheese:action.ingredients.cheese,
+            meat:action.ingredients.meat
+          },
           error:false
         }
         case actionsTypes.FETCH_INGREDIENTS_FAILED:
           return{
             ...state,
-            ingredients:null
+           error:true
           }
       case actionsTypes.ADDINGREDIENT:
         return {

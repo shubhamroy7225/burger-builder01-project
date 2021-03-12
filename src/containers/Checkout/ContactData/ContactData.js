@@ -5,7 +5,9 @@ import Spinner from "../../../components/UI/Spinner/Spinner";
 import classes from "./ContactData.css";
 import axios from "../../../axios-orders";
 import Input from "../../../components/UI/Input/Input";
-
+import { connect } from "react-redux";
+import withErrorHandler from "../../../hoc/withErrorHandler/withErrorHandler";
+import * as orderBurgerActions from "../../../store/index";
 class ContactData extends Component {
   state = {
     orderForm: {
@@ -16,13 +18,13 @@ class ContactData extends Component {
           placeholder: "Your Name",
         },
         value: "",
-        validation:{
-          required:true
+        validation: {
+          required: true,
         },
-        valid:false,
-        touched:false,
-        valueType:'name',
-        isError:''
+        valid: false,
+        touched: false,
+        valueType: "name",
+        isError: "",
       },
       email: {
         elementType: "input",
@@ -31,13 +33,13 @@ class ContactData extends Component {
           placeholder: "Your email",
         },
         value: "",
-        validation:{
-          required:true
+        validation: {
+          required: true,
         },
-        valid:false,
-        touched:false,
-        valueType:'email',
-        isError:''
+        valid: false,
+        touched: false,
+        valueType: "email",
+        isError: "",
       },
 
       street: {
@@ -47,13 +49,13 @@ class ContactData extends Component {
           placeholder: "Street",
         },
         value: "",
-        validation:{
-          required:true
+        validation: {
+          required: true,
         },
-        valid:false,
-        touched:false,
-        valueType:'street',
-        isError:''
+        valid: false,
+        touched: false,
+        valueType: "street",
+        isError: "",
       },
       zipcode: {
         elementType: "input",
@@ -62,15 +64,15 @@ class ContactData extends Component {
           placeholder: "Zipcode",
         },
         value: "",
-        validation:{
-          required:true,
-          minLength:5,
-          maxLength:5
+        validation: {
+          required: true,
+          minLength: 5,
+          maxLength: 5,
         },
-        valid:false,
-        touched:false,
-        valueType:'zipcode',
-        isError:''
+        valid: false,
+        touched: false,
+        valueType: "zipcode",
+        isError: "",
       },
       country: {
         elementType: "input",
@@ -79,13 +81,13 @@ class ContactData extends Component {
           placeholder: "Country",
         },
         value: "",
-        validation:{
-          required:true
+        validation: {
+          required: true,
         },
-        valid:false,
-        touched:false,
-        valueType:'country',
-        isError:''
+        valid: false,
+        touched: false,
+        valueType: "country",
+        isError: "",
       },
       deliveryMethod: {
         elementType: "select",
@@ -102,52 +104,52 @@ class ContactData extends Component {
           ],
         },
         value: "",
-        validation:{},
-        valid:true
+        validation: {},
+        valid: true,
       },
     },
-    formIsValid:false,
-    loading:false
+    formIsValid: false,
   };
-  checkValidity = (value,rules)=>{
-     let isValid = true
-      if( rules.required){
-        isValid = value.trim() !== '' && isValid
-      }
-      if(rules.minLength){
-        isValid = value.length >= rules.minLength && isValid
-      }
-      if(rules.maxLength){
-        isValid = value.length <= rules.maxLength && isValid
-      }
-      return isValid
-  } 
+  checkValidity = (value, rules) => {
+    let isValid = true;
+    if (rules.required) {
+      isValid = value.trim() !== "" && isValid;
+    }
+    if (rules.minLength) {
+      isValid = value.length >= rules.minLength && isValid;
+    }
+    if (rules.maxLength) {
+      isValid = value.length <= rules.maxLength && isValid;
+    }
+    return isValid;
+  };
 
   orderHandler = (event) => {
     event.preventDefault();
-    this.setState({ loading: true });
-    const users = {}
-    for(let user in this.state.orderForm){
-        if(users[user] === 'deliveryMethod'){
-            users[user] = this.state.orderForm.user.options.value
-        }else{
-        users[user] = this.state.orderForm[user].value
-        }
+    // this.setState({ loading: true });
+    const users = {};
+    for (let user in this.state.orderForm) {
+      if (users[user] === "deliveryMethod") {
+        users[user] = this.state.orderForm.user.options.value;
+      } else {
+        users[user] = this.state.orderForm[user].value;
+      }
     }
     const order = {
       ingredients: this.props.ingredients,
       price: this.props.price,
-      userDetail:users
+      userDetail: users,
     };
-    axios
-      .post("/orders.json", order)
-      .then((response) => {
-        this.setState({ loading: false });
-        this.props.history.push("/");
-      })
-      .catch((error) => {
-        this.setState({ loading: false });
-      });
+    this.props.onOrderBurger(order);
+    // axios
+    //   .post("/orders.json", order)
+    //   .then((response) => {
+    //     this.setState({ loading: false });
+    //     this.props.history.push("/");
+    //   })
+    //   .catch((error) => {
+    //     this.setState({ loading: false });
+    //   });
   };
   inputHandler = (event, formIdentifier) => {
     const newOrdeForm = {
@@ -157,14 +159,17 @@ class ContactData extends Component {
       ...newOrdeForm[formIdentifier],
     };
     updatedFormElement.value = event.target.value;
-    updatedFormElement.valid = this.checkValidity(updatedFormElement.value,updatedFormElement.validation)
-    updatedFormElement.touched=true
+    updatedFormElement.valid = this.checkValidity(
+      updatedFormElement.value,
+      updatedFormElement.validation
+    );
+    updatedFormElement.touched = true;
     newOrdeForm[formIdentifier] = updatedFormElement;
-    let formIsValid = true
-    for(let inputIdentitier in newOrdeForm){
-      formIsValid = newOrdeForm[inputIdentitier].valid && formIsValid
+    let formIsValid = true;
+    for (let inputIdentitier in newOrdeForm) {
+      formIsValid = newOrdeForm[inputIdentitier].valid && formIsValid;
     }
-    this.setState({ orderForm: newOrdeForm,formIsValid:formIsValid });
+    this.setState({ orderForm: newOrdeForm, formIsValid: formIsValid });
   };
 
   render() {
@@ -196,7 +201,7 @@ class ContactData extends Component {
         </Button>
       </form>
     );
-    if (this.state.loading) {
+    if (this.props.loading) {
       form = <Spinner />;
     }
     return (
@@ -207,5 +212,21 @@ class ContactData extends Component {
     );
   }
 }
+const mapStateToProps = (state) => {
+  return {
+    ings: state.burgerBuilderReducer.ingredients,
+    price:state.burgerBuilderReducer.totalPrice,
+    loading: state.orderReducer.loading,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onOrderBurger: (orderData) =>
+      dispatch(orderBurgerActions.purchaseStart(orderData)),
+  };
+};
 
-export default ContactData;
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withErrorHandler(ContactData, axios));
